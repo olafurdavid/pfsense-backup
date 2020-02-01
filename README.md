@@ -4,8 +4,8 @@ Prerequisites
 
 Environment file (.env)
 ```
-USER=admin
-PASS=admin
+PFSENSE_USER=admin
+PFSENSE_PASS=admin
 URL=http://192.168.1.1
 FOLDER=backupfolder
 ```

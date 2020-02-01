@@ -13,8 +13,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-USER = os.getenv("USER")
-PASS = os.getenv("PASS")
+USER = os.getenv("PFSENSE_USER")
+PASS = os.getenv("PFSENSE_PASS")
 URL = os.getenv("URL")
 FOLDER = os.getenv("FOLDER")
 
