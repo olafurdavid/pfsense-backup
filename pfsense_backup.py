@@ -17,7 +17,7 @@ PASS = os.getenv("PASS")
 URL = os.getenv("URL")
 FOLDER = os.getenv("FOLDER")
 
-if USER is None or PASS is None or URL is None:
+if USER is None or PASS is None or URL is None or FOLDER is None:
     print("Please set .env with USER, PASS and URL variables")
     print("Example:")
     print("  USER=admin")
