@@ -6,7 +6,7 @@ import re
 import datetime
 import os
 import requests
-from requests.exceptions import Timeout
+from requests.exceptions import RequestException
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 #from requests.exceptions import Timeout
@@ -25,7 +25,7 @@ if USER is None or PASS is None or URL is None or FOLDER is None:
     print("  PASS=password")
     print("  URL=http://192.168.1.1")
     print("  FOLDER=backups")
-    exit()
+    exit(1)
 
 PAGE = f"{URL}/diag_backup.php"
 
@@ -61,9 +61,10 @@ def get_backup():
 
     try:
         response = client.get(PAGE, timeout=20)
-    except Timeout:
+    except RequestException as error:
         print("Error getting initial CSRF token. Bailing out!")
-        exit()
+        print(error)
+        exit(1)
 
     csrf_token = get_csrf(response.content)
     print(f"Got CRSF token for login page: {csrf_token}")
@@ -73,9 +74,10 @@ def get_backup():
 
     try:
         response = client.post(PAGE, data=login_data, timeout=20)
-    except Timeout:
+    except RequestException as error:
         print("Error login in. Bailing out!")
-        exit()
+        print(error)
+        exit(1)
 
     csrf_token = get_csrf(response.content)
     print(f"Got CRSF token for backup page: {csrf_token}")
@@ -84,9 +86,10 @@ def get_backup():
 
     try:
         response = client.post(PAGE, data=backup_data, timeout=20)
-    except Timeout:
+    except RequestException as error:
         print("Error downloading xml backup. Bailing out!")
-        exit()
+        print(error)
+        exit(1)
     xml_backup = response.content
     write_backup(xml_backup)
 
