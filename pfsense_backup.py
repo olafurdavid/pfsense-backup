@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: ISC
 """ Download backup from remote pfsense host """
 
+import argparse
 import re
 import datetime
 import os
@@ -9,7 +10,6 @@ import requests
 from requests.exceptions import RequestException
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-#from requests.exceptions import Timeout
 
 load_dotenv()
 
@@ -27,10 +27,15 @@ if USER is None or PASS is None or URL is None or FOLDER is None:
     print("  FOLDER=backups")
     exit(1)
 
+PARSER = argparse.ArgumentParser()
+PARSER.add_argument("-q", "--quiet", help="Suppress output (quiet)", action='store_false')
+ARGS = PARSER.parse_args()
+VERBOSE = ARGS.quiet
+
 PAGE = f"{URL}/diag_backup.php"
 
-print(f"Performing backup on: {PAGE}")
-
+if VERBOSE:
+    print(f"Performing backup on: {PAGE}")
 
 def get_csrf(body):
     """ Retrieve CRSF token from html body """
@@ -51,7 +56,8 @@ def write_backup(content):
         pathname = f"backup-{date}.xml"
     else:
         pathname = f"{FOLDER}/backup-{date}.xml"
-    print(f"Writing to {pathname}")
+    if VERBOSE:
+        print(f"Writing to {pathname}")
     with open(pathname, "wb") as file_name:
         file_name.write(content)
 
@@ -67,7 +73,8 @@ def get_backup():
         exit(1)
 
     csrf_token = get_csrf(response.content)
-    print(f"Got CRSF token for login page: {csrf_token}")
+    if VERBOSE:
+        print(f"Got CRSF token for login page: {csrf_token}")
 
     login_data = {"login": "Login", "usernamefld": USER, \
                     "passwordfld": PASS, "__csrf_magic": csrf_token}
@@ -80,7 +87,8 @@ def get_backup():
         exit(1)
 
     csrf_token = get_csrf(response.content)
-    print(f"Got CRSF token for backup page: {csrf_token}")
+    if VERBOSE:
+        print(f"Got CRSF token for backup page: {csrf_token}")
 
     backup_data = {"download": "download", "donotbackuprrd": "yes", "__csrf_magic": csrf_token}
 
