@@ -28,7 +28,9 @@ if USER is None or PASS is None or URL is None or FOLDER is None:
     exit(1)
 
 PARSER = argparse.ArgumentParser()
-PARSER.add_argument("-q", "--quiet", help="Suppress output (quiet)", action='store_false')
+PARSER.add_argument("-q", "--quiet",
+                    help="Suppress output (quiet)",
+                    action='store_false')
 ARGS = PARSER.parse_args()
 VERBOSE = ARGS.quiet
 
@@ -37,11 +39,12 @@ PAGE = f"{URL}/diag_backup.php"
 if VERBOSE:
     print(f"Performing backup on: {PAGE}")
 
+
 def get_csrf(body):
     """ Retrieve CRSF token from html body """
     pattern = re.compile(r"var\s+csrfMagicToken\s+=\s+\"(.*?)\";")
     soup = BeautifulSoup(body, "html.parser")
-    all_script = soup.find_all("script", {"src":False})
+    all_script = soup.find_all("script", {"src": False})
     for individual_script in all_script:
         all_value = individual_script.string
         if all_value:
@@ -49,9 +52,14 @@ def get_csrf(body):
                 return pattern.search(all_value).group(1)
     return None
 
+
 def write_backup(content):
     """ Writes raw response (xml document) to file """
-    date = datetime.datetime.now().replace(microsecond=0).isoformat().replace(':', '-')
+    date = (
+        datetime.datetime.now()
+        .replace(microsecond=0)
+        .isoformat()
+        .replace(':', '-'))
     if FOLDER is None:
         pathname = f"backup-{date}.xml"
     else:
@@ -60,6 +68,7 @@ def write_backup(content):
         print(f"Writing to {pathname}")
     with open(pathname, "wb") as file_name:
         file_name.write(content)
+
 
 def get_backup():
     """ Perform backup """
@@ -76,8 +85,8 @@ def get_backup():
     if VERBOSE:
         print(f"Got CRSF token for login page: {csrf_token}")
 
-    login_data = {"login": "Login", "usernamefld": USER, \
-                    "passwordfld": PASS, "__csrf_magic": csrf_token}
+    login_data = {"login": "Login", "usernamefld": USER,
+                  "passwordfld": PASS, "__csrf_magic": csrf_token}
 
     try:
         response = client.post(PAGE, data=login_data, timeout=20)
@@ -90,7 +99,8 @@ def get_backup():
     if VERBOSE:
         print(f"Got CRSF token for backup page: {csrf_token}")
 
-    backup_data = {"download": "download", "donotbackuprrd": "yes", "__csrf_magic": csrf_token}
+    backup_data = {"download": "download", "donotbackuprrd": "yes",
+                   "__csrf_magic": csrf_token}
 
     try:
         response = client.post(PAGE, data=backup_data, timeout=20)
