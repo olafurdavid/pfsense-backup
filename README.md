@@ -4,7 +4,7 @@ Python script to take backup of remote pfsense installation.
 
 ## Prerequisites
 
-    apt install python3-dotenv python3-bs4
+    pip install -r requirements.txt
 
 ## Environment file (.env)
 ```
